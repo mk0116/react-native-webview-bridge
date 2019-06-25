@@ -1,5 +1,6 @@
 package com.github.alinz.reactnativewebviewbridge;
 
+import android.view.ViewGroup;
 import android.webkit.WebView;
 
 import com.facebook.react.bridge.ReadableArray;
@@ -8,12 +9,15 @@ import com.facebook.react.views.webview.ReactWebViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nullable;
 
 public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
+    private static ArrayList<WebView> webViews = new ArrayList<>();
+    private static Map<WebView, Boolean> webViewInUse = new HashMap<>();
 
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
 
@@ -35,8 +39,21 @@ public class WebViewBridgeManager extends ReactWebViewManager {
 
     @Override
     protected WebView createViewInstance(ThemedReactContext reactContext) {
-        WebView root = super.createViewInstance(reactContext);
+        WebView root = null;
+        for (int i = 0; i< webViews.size(); i++) {
+            if (!webViewInUse.get(webViews.get(i))) {
+                root = webViews.get(i);
+                webViewInUse.put(root, true);
+                break;
+            }
+        }
+        if (root != null) {
+            return root;
+        }
+        root = super.createViewInstance(reactContext);
         root.addJavascriptInterface(new JavascriptBridge(root), "WebViewBridge");
+        webViews.add(root);
+        webViewInUse.put(root, true);
         return root;
     }
 
@@ -74,5 +91,13 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     @ReactProp(name = "allowUniversalAccessFromFileURLs")
     public void setAllowUniversalAccessFromFileURLs(WebView root, boolean allows) {
         root.getSettings().setAllowUniversalAccessFromFileURLs(allows);
+    }
+
+    @Override
+    public void onDropViewInstance(WebView webView) {
+        webViewInUse.put(webView, false);
+        if (webView.getParent() != null ){
+            ((ViewGroup)webView.getParent()).removeView(webView);
+        }
     }
 }
