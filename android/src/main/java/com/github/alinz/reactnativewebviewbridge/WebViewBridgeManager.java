@@ -2,7 +2,9 @@ package com.github.alinz.reactnativewebviewbridge;
 
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.Toast;
 
+import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.ThemedReactContext;
 import com.facebook.react.views.webview.ReactWebViewManager;
@@ -16,8 +18,8 @@ import javax.annotation.Nullable;
 
 public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
-    private static ArrayList<WebView> webViews = new ArrayList<>();
-    private static Map<WebView, Boolean> webViewInUse = new HashMap<>();
+    public static ArrayList<WebView> webViews = new ArrayList<>();
+    public static Map<WebView, Boolean> webViewInUse = new HashMap<>();
 
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
 
