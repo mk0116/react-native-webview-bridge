@@ -29,7 +29,6 @@ var {
   Text,
   View,
   ViewPropTypes,
-  WebView,
   requireNativeComponent,
   DeviceEventEmitter,
   NativeModules: {
