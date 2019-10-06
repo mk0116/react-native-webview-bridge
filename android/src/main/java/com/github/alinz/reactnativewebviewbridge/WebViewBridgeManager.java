@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.facebook.react.views.webview.ReactWebViewManager;
+import com.reactnativecommunity.webview.RNCWebViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class WebViewBridgeManager extends ReactWebViewManager {
+public class WebViewBridgeManager extends RNCWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
     public static ArrayList<WebView> webViews = new ArrayList<>();
     public static Map<WebView, Boolean> webViewInUse = new HashMap<>();
@@ -29,13 +29,10 @@ public class WebViewBridgeManager extends ReactWebViewManager {
     }
 
     @Override
-    public
-    @Nullable
+    public @Nullable
     Map<String, Integer> getCommandsMap() {
         Map<String, Integer> commandsMap = super.getCommandsMap();
-
         commandsMap.put("sendToBridge", COMMAND_SEND_TO_BRIDGE);
-
         return commandsMap;
     }
 
