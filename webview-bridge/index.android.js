@@ -32,7 +32,8 @@ var {
   requireNativeComponent,
   DeviceEventEmitter,
   NativeModules: {
-    WebViewBridgeManager
+    WebViewBridgeManager,
+    LectureWebViewBridgeManager
   }
 } = ReactNative;
 
@@ -45,6 +46,7 @@ var WebViewBridgeState = keyMirror({
 });
 
 var RCTWebViewBridge = requireNativeComponent('RCTWebViewBridge', WebViewBridge);
+var RCTLectureWebViewBridge = requireNativeComponent('RCTLectureWebViewBridge', WebViewBridge);
 
 /**
  * Renders a native WebView.
@@ -53,6 +55,7 @@ var WebViewBridge = createReactClass({
 
   propTypes: {
     ...RCTWebViewBridge.propTypes,
+    ...RCTLectureWebViewBridge.propTypes,
 
     /**
      * Will be called once the message is being sent from webview
@@ -68,7 +71,7 @@ var WebViewBridge = createReactClass({
     };
   },
 
-  
+
   componentWillMount: function() {
     DeviceEventEmitter.addListener("webViewBridgeMessage", (body) => {
       const { onBridgeMessage } = this.props;
@@ -118,18 +121,32 @@ var WebViewBridge = createReactClass({
     let {source, ...props} = {...this.props};
 
     var webView =
-      <RCTWebViewBridge
-        ref={RCT_WEBVIEWBRIDGE_REF}
-        key="webViewKey"
- 				javaScriptEnabled={true}
-        {...props}
-        source={resolveAssetSource(source)}
-        style={webViewStyles}
-        onLoadingStart={this.onLoadingStart}
-        onLoadingFinish={this.onLoadingFinish}
-        onLoadingError={this.onLoadingError}
-        onChange={this.onMessage}
-      />;
+      this.props.isLecture ?
+        <RCTLectureWebViewBridge
+          ref={RCT_WEBVIEWBRIDGE_REF}
+          key="webViewKey"
+          javaScriptEnabled={true}
+          {...props}
+          source={resolveAssetSource(source)}
+          style={webViewStyles}
+          onLoadingStart={this.onLoadingStart}
+          onLoadingFinish={this.onLoadingFinish}
+          onLoadingError={this.onLoadingError}
+          onChange={this.onMessage}
+        />
+      :
+        <RCTWebViewBridge
+          ref={RCT_WEBVIEWBRIDGE_REF}
+          key="webViewKey"
+          javaScriptEnabled={true}
+          {...props}
+          source={resolveAssetSource(source)}
+          style={webViewStyles}
+          onLoadingStart={this.onLoadingStart}
+          onLoadingFinish={this.onLoadingFinish}
+          onLoadingError={this.onLoadingError}
+          onChange={this.onMessage}
+        />;
 
     return (
       <View style={styles.container}>
@@ -145,10 +162,17 @@ var WebViewBridge = createReactClass({
     }
   },
 
+  getWebViewBridge() {
+    if (this.props.isLecture) {
+      return UIManager.RCTLectureWebViewBridge;
+    }
+    return UIManager.RCTWebViewBridge
+  },
+
   goForward: function() {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewBridgeHandle(),
-      UIManager.RCTWebViewBridge.Commands.goForward,
+      this.getWebViewBridge().Commands.goForward,
       null
     );
   },
@@ -156,7 +180,7 @@ var WebViewBridge = createReactClass({
   goBack: function() {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewBridgeHandle(),
-      UIManager.RCTWebViewBridge.Commands.goBack,
+      this.getWebViewBridge().Commands.goBack,
       null
     );
   },
@@ -164,7 +188,7 @@ var WebViewBridge = createReactClass({
   reload: function() {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewBridgeHandle(),
-      UIManager.RCTWebViewBridge.Commands.reload,
+      this.getWebViewBridge().Commands.reload,
       null
     );
   },
@@ -172,7 +196,7 @@ var WebViewBridge = createReactClass({
   sendToBridge: function (message: string) {
     UIManager.dispatchViewManagerCommand(
       this.getWebViewBridgeHandle(),
-      UIManager.RCTWebViewBridge.Commands.sendToBridge,
+      this.getWebViewBridge().Commands.sendToBridge,
       [message]
     );
   },
