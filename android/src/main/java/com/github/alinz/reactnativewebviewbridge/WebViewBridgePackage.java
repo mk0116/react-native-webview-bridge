@@ -15,13 +15,20 @@ public class WebViewBridgePackage implements ReactPackage {
     public List<NativeModule> createNativeModules(ReactApplicationContext reactApplicationContext) {
         List<NativeModule> modules = new ArrayList<>();
         modules.add(new WebViewModule(reactApplicationContext));
+        modules.add(new LectureWebViewModule(reactApplicationContext));
         return modules;
     }
 
     @Override
     public List<ViewManager> createViewManagers(ReactApplicationContext reactApplicationContext) {
         return Arrays.<ViewManager>asList(
-                new WebViewBridgeManager()
+                new WebViewBridgeManager(),
+                new LectureWebViewBridgeManager()
         );
+    }
+
+    @Override
+    public List<Class<? extends JavaScriptModule>> createJSModules() {
+        return Arrays.asList();
     }
 }
