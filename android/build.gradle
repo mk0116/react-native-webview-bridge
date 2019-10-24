@@ -30,6 +30,5 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.facebook.react:react-native:+'
-    implementation project(':react-native-webview')
+    compile 'com.facebook.react:react-native:0.19.+'
 }
