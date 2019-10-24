@@ -17,6 +17,13 @@ public class WebViewModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void clear() {
         WebViewBridgeManager.webViews.clear();
-        WebViewBridgeManager.webViewInUse.clear();
+        WebViewBridgeManager.currentWebViewId = 0;
+    }
+
+    @ReactMethod
+    public void nextWebView() {
+        WebViewBridgeManager.webViews.clear();
+        WebViewBridgeManager.currentWebViewId =
+        (WebViewBridgeManager.currentWebViewId + 1) % WebViewBridgeManager.webViews.size();
     }
 }
