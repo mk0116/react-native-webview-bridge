@@ -7,7 +7,7 @@ import android.widget.Toast;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.ReadableArray;
 import com.facebook.react.uimanager.ThemedReactContext;
-import com.reactnativecommunity.webview.RNCWebViewManager;
+import com.facebook.react.views.webview.ReactWebViewManager;
 import com.facebook.react.uimanager.annotations.ReactProp;
 
 import java.util.ArrayList;
@@ -16,11 +16,10 @@ import java.util.Map;
 
 import javax.annotation.Nullable;
 
-public class WebViewBridgeManager extends RNCWebViewManager {
+public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
     public static ArrayList<WebView> webViews = new ArrayList<>();
-    public static Map<WebView, Boolean> webViewInUse = new HashMap<>();
-
+    public static int currentWebViewId = 0;
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
 
     @Override
@@ -29,8 +28,7 @@ public class WebViewBridgeManager extends RNCWebViewManager {
     }
 
     @Override
-    public @Nullable
-    Map<String, Integer> getCommandsMap() {
+    public Map<String, Integer> getCommandsMap() {
         Map<String, Integer> commandsMap = super.getCommandsMap();
         commandsMap.put("sendToBridge", COMMAND_SEND_TO_BRIDGE);
         return commandsMap;
@@ -38,22 +36,22 @@ public class WebViewBridgeManager extends RNCWebViewManager {
 
     @Override
     protected WebView createViewInstance(ThemedReactContext reactContext) {
-        WebView root = null;
-        for (int i = 0; i< webViews.size(); i++) {
-            if (!webViewInUse.get(webViews.get(i))) {
-                root = webViews.get(i);
-                webViewInUse.put(root, true);
-                break;
-            }
+        WebView webView = null;
+        if (webViews.size() < 3) {
+            currentWebViewId = webViews.size();
+            webView = super.createViewInstance(reactContext);
+            webView.addJavascriptInterface(new JavascriptBridge(webView), "WebViewBridge");
+            webViews.add(webView);
         }
-        if (root != null) {
-            return root;
+        else {
+            webView = webViews.get(currentWebViewId);
         }
-        root = super.createViewInstance(reactContext);
-        root.addJavascriptInterface(new JavascriptBridge(root), "WebViewBridge");
-        webViews.add(root);
-        webViewInUse.put(root, true);
-        return root;
+
+        if (webView.getParent() != null ) {
+            ((ViewGroup)webView.getParent()).removeView(webView);
+        }
+
+        return webView;
     }
 
     @Override
@@ -94,7 +92,6 @@ public class WebViewBridgeManager extends RNCWebViewManager {
 
     @Override
     public void onDropViewInstance(WebView webView) {
-        webViewInUse.put(webView, false);
         if (webView.getParent() != null ){
             ((ViewGroup)webView.getParent()).removeView(webView);
         }
