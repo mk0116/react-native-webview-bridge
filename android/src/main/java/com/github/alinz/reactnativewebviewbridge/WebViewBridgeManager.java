@@ -18,8 +18,6 @@ import javax.annotation.Nullable;
 
 public class WebViewBridgeManager extends ReactWebViewManager {
     private static final String REACT_CLASS = "RCTWebViewBridge";
-    public static ArrayList<WebView> webViews = new ArrayList<>();
-    public static int currentWebViewId = 0;
     public static final int COMMAND_SEND_TO_BRIDGE = 101;
 
     @Override
@@ -36,22 +34,7 @@ public class WebViewBridgeManager extends ReactWebViewManager {
 
     @Override
     protected WebView createViewInstance(ThemedReactContext reactContext) {
-        WebView webView = null;
-        if (webViews.size() < 3) {
-            currentWebViewId = webViews.size();
-            webView = super.createViewInstance(reactContext);
-            webView.addJavascriptInterface(new JavascriptBridge(webView), "WebViewBridge");
-            webViews.add(webView);
-        }
-        else {
-            webView = webViews.get(currentWebViewId);
-        }
-
-        if (webView.getParent() != null ) {
-            ((ViewGroup)webView.getParent()).removeView(webView);
-        }
-
-        return webView;
+        return super.createViewInstance(reactContext);;
     }
 
     @Override
