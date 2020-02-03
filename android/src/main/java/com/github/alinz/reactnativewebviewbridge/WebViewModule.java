@@ -14,11 +14,4 @@ public class WebViewModule extends ReactContextBaseJavaModule {
     public String getName() {
         return "WebViewModule";
     }
-
-    @ReactMethod
-    public void clear(Promise promise) {
-        WebViewBridgeManager.webViews.clear();
-        WebViewBridgeManager.currentWebViewId = 0;
-        promise.resolve(null);
-    }
 }
