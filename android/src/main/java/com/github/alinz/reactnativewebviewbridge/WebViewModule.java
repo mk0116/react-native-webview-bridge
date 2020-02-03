@@ -21,10 +21,4 @@ public class WebViewModule extends ReactContextBaseJavaModule {
         WebViewBridgeManager.currentWebViewId = 0;
         promise.resolve(null);
     }
-
-    @ReactMethod
-    public void nextWebView() {
-        WebViewBridgeManager.currentWebViewId =
-        (WebViewBridgeManager.currentWebViewId + 1) % WebViewBridgeManager.webViews.size();
-    }
 }
