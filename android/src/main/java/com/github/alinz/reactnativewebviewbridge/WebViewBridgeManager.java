@@ -34,7 +34,9 @@ public class WebViewBridgeManager extends ReactWebViewManager {
 
     @Override
     protected WebView createViewInstance(ThemedReactContext reactContext) {
-        return super.createViewInstance(reactContext);;
+        WebView webView = super.createViewInstance(reactContext);
+        webView.addJavascriptInterface(new JavascriptBridge(webView), "WebViewBridge");
+        return webView;
     }
 
     @Override
